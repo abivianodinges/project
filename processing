@@ -1,0 +1,52 @@
+import processing.serial.*;
+import processing.sound.*;
+Serial mySerial;
+
+String myString;
+int nl = 10;
+float myVal, myVal2;
+SinOsc sin, sin2;
+
+void setup(){
+  size(400, 600);
+  String myPort = Serial.list() [0];
+  mySerial = new Serial(this, myPort, 9600);
+  sin = new SinOsc(this);
+  sin.play(200, 0.2);
+  
+  
+  sin2 = new SinOsc(this);
+  sin2.play(250, 0.2);
+    
+  mySerial.buffer(10);
+}
+
+void draw() {
+  myString = mySerial.readStringUntil(nl);
+  String[] list = split(myString, ',');
+
+  if(list != null){
+    background(myVal2, 0, myVal);
+    stroke(myVal, 255, myVal);
+    fill(myVal2/2, myVal/2, 50);
+
+    float fsr1 = float(list[0]);
+    float fsr2 = float(list[1]);
+    
+
+    myVal = fsr1/100 * height;
+    myVal2 = fsr2/100 * height;
+    
+    rectMode(CENTER);
+    rect(100, height-(myVal/2), 100, myVal);
+    rect(300, height-(myVal2/2), 100, myVal2);
+    
+    float amplitude = map(myVal, height, 0, 0.4, 0.0);
+    float amplitude2 = map(myVal2, height, 0, 0.4, 0.0);
+    
+    sin.amp(amplitude);
+    sin2.amp(amplitude2);
+    
+  }
+  
+}
