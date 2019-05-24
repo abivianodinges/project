@@ -1,0 +1,19 @@
+int fsrReading;
+int fsrReading2;
+int fsrReading3;
+
+void setup(){
+  Serial.begin(9600); 
+}
+
+void loop(){
+  fsrReading = analogRead(1);
+  fsrReading2 = analogRead(0);
+  fsrReading3 = analogRead(2);
+  Serial.print(fsrReading);
+  Serial.print(",");
+  Serial.print(fsrReading2);
+  Serial.print(",");
+  Serial.println(fsrReading3);
+  delay(100);
+}
