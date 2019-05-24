@@ -1,52 +1,83 @@
 import processing.serial.*;
 import processing.sound.*;
-Serial mySerial;
+import processing.io.*;
 
+Serial mySerial;
 String myString;
 int nl = 10;
-float myVal, myVal2;
-SinOsc sin, sin2;
+float myVal, myVal2, myVal3;
+SinOsc sin, sin2, sin3;
 
 void setup(){
-  size(400, 600);
-  String myPort = Serial.list() [0];
-  mySerial = new Serial(this, myPort, 9600);
+  size(600, 600); 
+  
+  mySerial = new Serial(this, "/dev/ttyACM0", 9600);
   sin = new SinOsc(this);
   sin.play(200, 0.2);
   
-  
   sin2 = new SinOsc(this);
   sin2.play(250, 0.2);
-    
-  mySerial.buffer(10);
-}
+  
+  sin3 = new SinOsc(this);
+  sin3.play(300, 0.2);
+  
+  GPIO.pinMode(16, GPIO.OUTPUT);
+  GPIO.pinMode(20, GPIO.OUTPUT);
+  GPIO.pinMode(21, GPIO.OUTPUT);
+  
+  mySerial.buffer(5);
+} 
+  
 
 void draw() {
   myString = mySerial.readStringUntil(nl);
   String[] list = split(myString, ',');
-
-  if(list != null){
-    background(myVal2, 0, myVal);
-    stroke(myVal, 255, myVal);
-    fill(myVal2/2, myVal/2, 50);
+  if(list != null && list.length > 1){
+    background(myVal2, myVal3, myVal);
+    stroke(myVal, myVal3, myVal);
+    fill(myVal2/2, myVal/2, myVal3/2);
 
     float fsr1 = float(list[0]);
     float fsr2 = float(list[1]);
-    
+    float fsr3 = float(list[2]);
 
     myVal = fsr1/100 * height;
     myVal2 = fsr2/100 * height;
+    myVal3 = fsr3/100 * height;
     
     rectMode(CENTER);
     rect(100, height-(myVal/2), 100, myVal);
     rect(300, height-(myVal2/2), 100, myVal2);
+    rect(500, height-(myVal3/2), 100, myVal3);
     
     float amplitude = map(myVal, height, 0, 0.4, 0.0);
     float amplitude2 = map(myVal2, height, 0, 0.4, 0.0);
+    float amplitude3 = map(myVal3, height, 0, 0.4, 0.0);
     
-    sin.amp(amplitude);
-    sin2.amp(amplitude2);
+    if(amplitude > 0) {
+      sin.amp(amplitude);
+      GPIO.digitalWrite(21, GPIO.HIGH);
+    }
+    if(amplitude == 0) {
+      sin.amp(amplitude);
+      GPIO.digitalWrite(21, GPIO.LOW);
+    }
     
-  }
-  
+    if(amplitude2 > 0) {
+      sin2.amp(amplitude2);
+      GPIO.digitalWrite(20, GPIO.HIGH);
+    }
+    if(amplitude2 == 0) {
+      sin2.amp(amplitude2);
+      GPIO.digitalWrite(20,GPIO.LOW);
+    }
+    if(amplitude3 > 0) {
+      sin3.amp(amplitude3);
+      GPIO.digitalWrite(16, GPIO.HIGH);
+    }
+    if(amplitude3 == 0) {
+      sin3.amp(amplitude3);
+      GPIO.digitalWrite(16, GPIO.LOW);
+    }
+  } 
 }
